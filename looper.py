@@ -69,6 +69,7 @@ def main():
     folder_loc='C:\\auto_exp\\alu_plate'
     folder_loc2='C://auto_exp//alu_plate'
     file_name='alu_plate'
+    #changes a particular value in Fortran file; in this case eta
     """
     file1=open(folder_loc+'\\'+file_name+'.for','r')
     data=file1.read()
@@ -83,6 +84,7 @@ def main():
         file2.write(data[ii]+'\n')
     file2.close()
     """
+    #compiles fortran file and created exe file
     os.system('del command.bat')
     com=open('command.bat','w')
     com.write('cd '+folder_loc+'\n')
@@ -96,6 +98,8 @@ def main():
     com.write('df /exe '+file_name+'.obj autlib*.obj eispack.obj\n')
     com.close()
     os.system('command.bat')
+
+    #loop for changing the force levels and runnging the AUTO to get the response
     count=1
     for force in forcelevels:
         conPara=2
@@ -111,7 +115,7 @@ def main():
         #changing the 3 control file
         row=row_find(folder_loc2,file_name)
         print 'found row = '+str(row)
-        print 'starting third contorl fiel change'   
+        print 'starting third control file change'   
         third_control(folder_loc2,file_name,row)        
         #executing the newrun
         print 'starting newrun'
