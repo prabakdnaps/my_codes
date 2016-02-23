@@ -1,5 +1,5 @@
 import os, time
-
+import smtplib
 
 def auto_exe(folder_loc, file_name, conPara):
     os.system('del command.bat')
@@ -64,50 +64,50 @@ def row_find(folder_loc2,file_name):
 def main():
     start_time=time.time()
     #initialize with program name and folder name
-    eta=0.0117
-    forcelevels=[7.0]
-    folder_loc='C:\\auto_exp\\alu_plate'
-    folder_loc2='C://auto_exp//alu_plate'
-    file_name='alu_plate'
-    #changes a particular value in Fortran file; in this case eta
-    """
-    file1=open(folder_loc+'\\'+file_name+'.for','r')
-    data=file1.read()
-    file1.close()
-    file2=open(folder_loc+'\\'+file_name+'.for','w')
-    data=data.split('\n')
-    for ii in range(len(data)-1):
-        if ii==47:
-            linedata=data[ii].split('\t')
-            linedata[-1]='eta='+str(eta)
-            data[ii]='\t'.join(linedata)
-        file2.write(data[ii]+'\n')
-    file2.close()
-    """
-    #compiles fortran file and created exe file
-    os.system('del command.bat')
-    com=open('command.bat','w')
-    com.write('cd '+folder_loc+'\n')
-    com.write('df -c -extend_source:132 '+file_name+'.for\n')
-    com.write('df -c -extend_source:132 autlib1.f\n')
-    com.write('df -c -extend_source:132 autlib2.f\n')
-    com.write('df -c -extend_source:132 autlib3.f\n')
-    com.write('df -c -extend_source:132 autlib4.f\n')
-    com.write('df -c -extend_source:132 autlib5.f\n')
-    com.write('df -c -extend_source:132 eispack.f\n')
-    com.write('df /exe '+file_name+'.obj autlib*.obj eispack.obj\n')
-    com.close()
-    os.system('command.bat')
-
+    eta=[0.012]
+    forcelevels=[100.0]
+    folder_loc='C:\\auto_exp\\neo_plate_30'
+    folder_loc2='C://auto_exp//neo_plate_30'
+    file_name='neo_plate'
+ 
     #loop for changing the force levels and runnging the AUTO to get the response
     count=1
-    for force in forcelevels:
+    for run in range(len(forcelevels)):
+       #changes a particular value in Fortran file; in this case eta
+        print run
+        file1=open(folder_loc+'\\'+file_name+'.for','r')
+        data=file1.read()
+        file1.close()
+        file2=open(folder_loc+'\\'+file_name+'.for','w')
+        data=data.split('\n')
+        for ii in range(len(data)-1):
+            if ii==47:
+                linedata=data[ii].split('\t')
+                linedata[-1]='eta='+str(eta[run])
+                data[ii]='\t'.join(linedata)
+            file2.write(data[ii]+'\n')
+        file2.close()
+        #compiles fortran file and created exe file
+        os.system('del command.bat')
+        com=open('command.bat','w')
+        com.write('cd '+folder_loc+'\n')
+        com.write('df -c -extend_source:132 '+file_name+'.for\n')
+        com.write('df -c -extend_source:132 autlib1.f\n')
+        com.write('df -c -extend_source:132 autlib2.f\n')
+        com.write('df -c -extend_source:132 autlib3.f\n')
+        com.write('df -c -extend_source:132 autlib4.f\n')
+        com.write('df -c -extend_source:132 autlib5.f\n')
+        com.write('df -c -extend_source:132 eispack.f\n')
+        com.write('df /exe '+file_name+'.obj autlib*.obj eispack.obj\n')
+        com.close()
+        os.system('command.bat')
+
         conPara=2
-        print 'force level = '+str(force)+' N'
+        print 'force level = '+str(forcelevels[run])+' N'
         start_time=time.time()
         #changing the second control file   
         print 'starting second control file change'   
-        second_control(folder_loc2,file_name,force)
+        second_control(folder_loc2,file_name,forcelevels[run])
         #executing the first run
         print 'starting second control run'
         auto_exe(folder_loc,file_name, conPara)
@@ -125,15 +125,23 @@ def main():
         conPara=3
         auto_exe(folder_loc,file_name, conPara)
         print 'saving the results'
-        os.system('mkdir '+folder_loc+'\\results_'+str(force)+'_'+str(eta))
-        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results_'+str(force)+'_'+str(eta)+'\\fort*')
-        os.system('del fort*')
+        os.system('mkdir '+folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run]))
+        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
+        os.system('del '+folder_loc+'\\fort*')
         final_time=time.time()-start_time
 
         print 'Time elasped for '+str(count)+' cycle = '+str(final_time)
         print 'Estimated time for finishing all the cycles = '+str((len(forcelevels)-count)*final_time)
         count=count+1
         print count
+        server=smtplib.SMTP('smtp.gmail.com',587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login('prabakaran.des@gmail.com','Pandinattu@01092014')
+        msg="\nRun completed"
+        server.sendmail('prabakaran.des@gmail.com','prabakaran.balasubramanian@mail.mcgill.ca',msg)
+
 main()
 #print('auto '+file_name+ ' '+str(conPara))
 #os.system('auto '+file_name+ ' '+str(conPara))
