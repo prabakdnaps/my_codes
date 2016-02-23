@@ -64,8 +64,8 @@ def row_find(folder_loc2,file_name):
 def main():
     start_time=time.time()
     #initialize with program name and folder name
-    eta=[0.012]
-    forcelevels=[100.0]
+    eta=[0.0025]
+    forcelevels=[4500.0]
     folder_loc='C:\\auto_exp\\neo_plate_30'
     folder_loc2='C://auto_exp//neo_plate_30'
     file_name='neo_plate'
@@ -128,20 +128,21 @@ def main():
         os.system('mkdir '+folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run]))
         os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
         os.system('del '+folder_loc+'\\fort*')
+        os.system('del '+folder_loc+'\\*.obj')
+        os.system('del '+folder_loc+'\\*.exe')
         final_time=time.time()-start_time
 
         print 'Time elasped for '+str(count)+' cycle = '+str(final_time)
         print 'Estimated time for finishing all the cycles = '+str((len(forcelevels)-count)*final_time)
         count=count+1
         print count
-        server=smtplib.SMTP('smtp.gmail.com',587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login('prabakaran.des@gmail.com','Pandinattu@01092014')
-        msg="\nRun completed"
-        server.sendmail('prabakaran.des@gmail.com','prabakaran.balasubramanian@mail.mcgill.ca',msg)
-
+    server=smtplib.SMTP('smtp.gmail.com',587)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    server.login('prabakaran.des@gmail.com','Pandinattu@01092014')
+    msg="\nRun completed"
+    server.sendmail('prabakaran.des@gmail.com','prabakaran.balasubramanian@mail.mcgill.ca',msg)
 main()
 #print('auto '+file_name+ ' '+str(conPara))
 #os.system('auto '+file_name+ ' '+str(conPara))
