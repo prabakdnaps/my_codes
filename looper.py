@@ -1,5 +1,6 @@
 import os, time
 import smtplib
+import time
 
 def auto_exe(folder_loc, file_name, conPara):
     os.system('del command.bat')
@@ -64,17 +65,15 @@ def row_find(folder_loc2,file_name):
 def main():
     start_time=time.time()
     #initialize with program name and folder name
-    eta=[0.0025]
-    forcelevels=[4500.0]
+    eta=[0.0035,0.0025]
+    forcelevels=[2500.0,3500.0]
     folder_loc='C:\\auto_exp\\neo_plate_30'
     folder_loc2='C://auto_exp//neo_plate_30'
     file_name='neo_plate'
- 
     #loop for changing the force levels and runnging the AUTO to get the response
     count=1
     for run in range(len(forcelevels)):
        #changes a particular value in Fortran file; in this case eta
-        print run
         file1=open(folder_loc+'\\'+file_name+'.for','r')
         data=file1.read()
         file1.close()
@@ -98,6 +97,26 @@ def main():
         com.write('df -c -extend_source:132 autlib4.f\n')
         com.write('df -c -extend_source:132 autlib5.f\n')
         com.write('df -c -extend_source:132 eispack.f\n')
+        com.close()
+        os.system('command.bat')
+        time.sleep(5)
+        while True:
+            statinfo = os.stat(folder_loc+'\\autlib1.obj')
+            if statinfo.st_size >10000:
+                print 'Success'
+                break
+            else:
+                print 'failed'
+                com=open('command.bat','w')
+                com.write('cd '+folder_loc+'\n')
+                com.write('df -c -extend_source:132 autlib1.f\n')
+                com.close()
+                os.system('command.bat')
+                time.sleep(5)
+        time.sleep(10)
+        os.system('del command.bat')
+        com=open('command.bat','w')
+        com.write('cd '+folder_loc+'\n')
         com.write('df /exe '+file_name+'.obj autlib*.obj eispack.obj\n')
         com.close()
         os.system('command.bat')
@@ -125,8 +144,8 @@ def main():
         conPara=3
         auto_exe(folder_loc,file_name, conPara)
         print 'saving the results'
-        os.system('mkdir '+folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run]))
-        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
+        os.system('mkdir '+folder_loc+'\\results1_'+str(forcelevels[run])+'_'+str(eta[run]))
+        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results1_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
         os.system('del '+folder_loc+'\\fort*')
         os.system('del '+folder_loc+'\\*.obj')
         os.system('del '+folder_loc+'\\*.exe')
