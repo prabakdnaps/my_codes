@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-foldername='C:\\auto_exp\\neo_plate_30\\'
-filenames=['results_100.0_0.01','results_3500.0_0.0025','results_3700.0_0.0025','results_4500.0_0.0025','4results_4500.0_0.0025','results_4500.0_0.0025']#,'results_500.0_0.009','results_1500.0_0.0045','results_2500.0_0.0035']
-forcelevels=['0.1Nup.txt','0.5Nup.txt','1.5Nup.txt','2.5Nup.txt','3.5Nup.txt','3.5Ndn.txt']
+foldername='C:\\auto_exp\\'
+filenames=['neo_plate_36\\results1_2500.0_0.0035','neo_plate_36\\results2_2500.0_0.0035','neo_plate_36\\results3_2500.0_0.0035','neo_plate_30\\results5_2500.0_0.0035','neo_plate_30\\results4_2500.0_0.0035','neo_plate_30\\results3_2500.0_0.0035','neo_plate_30\\results2_2500.0_0.0035']
+forcelevels=['neo_plate_36\\2.5Nup.txt']
 def experiments(forcelevels):
     for force in forcelevels:
         file2=open(foldername+force,'r')
@@ -20,7 +20,7 @@ def experiments(forcelevels):
         amp=np.asarray(amp)
         amp=amp/(2*np.pi*freq)/0.003
         freq=freq/13.2
-        plt.plot(freq,np.absolute(amp),'b-o',label=force)
+        plt.plot(freq,np.absolute(amp),'-+',label=force[-10:-4])
 experiments(forcelevels)
 
 def analytical(filenames):
@@ -29,7 +29,6 @@ def analytical(filenames):
         data=file1.read()
         file1.close()
         data=data.split('\n')
-        count=0
         for linenumber in range(len(data)):
             if 'TY' in data[linenumber]:
                 lineNo=linenumber
@@ -51,15 +50,26 @@ def analytical(filenames):
             tempdata=np.array([datali[4:-1]])
             temp1data=finaldata
             finaldata=np.vstack((temp1data,tempdata))
-        weight=[0.98,-0.23,0.23,-0.057,-0.928]#,0.81,-0.92,0.87,-0.76,0.81,-0.76,0.67]
+        if "neo_plate_30" in filename:
+            weight=[0.98,-0.23,0.23,-0.05,-0.92,0.81,-0.92,0.87,-0.76,0.81,-0.76,0.67]
+        if "neo_plate_36" in filename:
+            weight=[0.98,0.23,-0.92,-0.46,0.81,0.65,-0.92,-0.22,0.87,0.43,0.81,0.19]
+        if "neo_plate_42" in filename:
+            weight=[0.98,0.23,-0.92,-0.46,-0.23,-0.05,0.22,0.11,-0.92,-0.22,0.87,0.43,0.46,0.11,-0.43,-0.21]
+        if "neo_plate_45" in filename:
+            weight=[0.98,-0.92,0.81,-0.65,-0.23,0.22,-0.19,0.15,-0.92,0.87,0.46,-0.43,0.81,-0.65,-0.65]
         weighteddata=np.zeros((finaldata.shape[0]-1))
         for i in range(len(weight)):
             weighteddata=weighteddata+weight[i]*finaldata[1:,2*(1+i)]
-        plt.plot(finaldata[1:,0],weighteddata,'o',label=filename)
-        plt.xlabel(r'non-dimensional frequency ratio $\omega/\omega_{1,1}$')
-        plt.ylabel('non-dimensional amplitude (w/h)')
-        plt.title("visoelastic sheet response")
-        plt.grid(True)
-        plt.legend()
+        ident=filename.split('_')
+        plt.plot(-0.1+finaldata[1:,0],weighteddata,'-',label='dof='+ident[2][:2]+', f='+str(float(ident[3])/1000.0)+r' N, $\eta$='+ident[4]+' s')
+
 analytical(filenames)
+plt.gca().set_xlim(right=2.0)
+plt.xlabel(r'non-dimensional frequency ratio $\omega/\omega_{1,1}$')
+plt.ylabel('non-dimensional amplitude (w/h)')
+plt.title("visoelastic sheet response")
+plt.grid(True)
+plt.legend(loc='upper right')
+plt.savefig(foldername+'test.png')
 plt.show()
