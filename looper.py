@@ -65,11 +65,11 @@ def row_find(folder_loc2,file_name):
 def main():
     start_time=time.time()
     #initialize with program name and folder name
-    eta=[0.005,0.002,0.0018,0.0012]
-    forcelevels=[10.0,35.0,60.0,100.0]
-    folder_loc='C:\\auto_exp\\neo_plate2_39'
-    folder_loc2='C://auto_exp//neo_plate2_39'
-    file_name='neo_plate'
+    eta=[0.008]
+    forcelevels=[28.0]
+    folder_loc='C:\\Users\\Praba\\Documents\\Farbod_auto\\tomlinson'
+    folder_loc2='C://Users//Praba//Documents//Farbod_auto//tomlinson'
+    file_name='duffing'
     #loop for changing the force levels and runnging the AUTO to get the response
     count=1
     for run in range(len(forcelevels)):
@@ -142,8 +142,8 @@ def main():
         conPara=3
         auto_exe(folder_loc,file_name, conPara)
         print 'saving the results'
-        os.system('mkdir '+folder_loc+'\\results1_'+str(forcelevels[run])+'_'+str(eta[run]))
-        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results1_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
+        os.system('mkdir '+folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run]))
+        os.system('copy '+folder_loc+'\\fort* '+ folder_loc+'\\results_'+str(forcelevels[run])+'_'+str(eta[run])+'\\fort*')
         os.system('del '+folder_loc+'\\fort*')
         os.system('del '+folder_loc+'\\*.obj')
         os.system('del '+folder_loc+'\\*.exe')
